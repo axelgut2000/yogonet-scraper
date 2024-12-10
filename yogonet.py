@@ -73,7 +73,7 @@ def scrape_section(section_url):
 
             # Find the "Next" button and navigate to the next page
             try:
-                next_button = driver.find_element(By.CSS_SELECTOR, ".pagination .next a")
+                next_button = driver.find_element(By.CSS_SELECTOR, "div.contenedor_paginador_listado.anterior_siguiente > button.boton_paginador.siguiente")
                 next_button.click()
                 time.sleep(2)
                 logging.info("Navigated to the next page.")
