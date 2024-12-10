@@ -83,3 +83,53 @@ def scrape_section(section_url):
 
     except Exception as e:
         logging.error(f"Error scraping section {section_url}: {e}")
+
+
+def main():
+    """
+    Main function to execute the web scraping process.
+    """
+    try:
+        driver.maximize_window()
+        driver.get("https://www.yogonet.com/international")
+
+        # Locate and extract section URLs
+        parent_element = driver.find_element(By.CLASS_NAME, "item_menu.transition_02.tiene_hijos.categorias")
+        child_elements = parent_element.find_elements(By.CLASS_NAME, "item_menu.hijo")
+        hrefs = [child.find_element(By.TAG_NAME, "a").get_attribute("href") for child in child_elements]
+        logging.info(f"Found sections: {hrefs}")
+
+        # Scrape each section
+        for href in hrefs:
+            scrape_section(href)
+
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+
+    finally:
+        driver.quit()
+
+    # Post-processing
+    df = pd.DataFrame(scraped_data)
+
+    # Process and enhance data
+    df["Date"] = pd.to_datetime(df["Date"], errors="coerce").dt.date
+    df["Word_Count"] = df["Title"].apply(lambda x: len(x.split()) if x else 0)
+    df["Character_Count"] = df["Title"].apply(lambda x: len(x) if x else 0)
+    df["Capitalized_Words"] = df["Title"].apply(
+        lambda x: ", ".join([word for word in x.split() if word.istitle()]) if isinstance(x, str) else None
+    )
+
+    # Save to BigQuery
+    try:
+        job_config = bigquery.LoadJobConfig(write_disposition="WRITE_APPEND")
+        job = client.load_table_from_dataframe(df, TABLE_ID, job_config=job_config)
+        job.result()
+        logging.info(f"Successfully loaded {len(df)} rows into {TABLE_ID}.")
+    except Exception as e:
+        logging.error(f"Failed to load data into BigQuery: {e}")
+
+
+if __name__ == "__main__":
+    main()
+
