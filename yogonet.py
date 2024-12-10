@@ -102,7 +102,6 @@ def main():
         # Scrape each section
         for href in hrefs:
             scrape_section(href)
-
     except Exception as e:
         logging.error(f"An error occurred: {e}")
 

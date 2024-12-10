@@ -1,7 +1,5 @@
-pandas
 selenium
-webdriver-manager
+pandas
 beautifulsoup4
 google-cloud-bigquery
-requests
 pyarrow

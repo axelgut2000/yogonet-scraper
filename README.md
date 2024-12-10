@@ -32,7 +32,8 @@ A Python-based project to scrape articles and metadata from the Yogonet platform
   - `selenium`
   - `pandas`
   - `google-cloud-bigquery`
-
+  - `pyarrow`
+  - `beautifulsoup4`
 ---
 
 ## Setup
